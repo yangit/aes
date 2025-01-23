@@ -157,8 +157,6 @@
         if (document.getElementById('textarea_encoded').value.startsWith('http')) {
           const response = await fetch(document.getElementById('textarea_encoded').value);
           encodedJson = await response.json();
-
-
         } else {
           encodedJson = JSON.parse(document.getElementById('textarea_encoded').value);
         }
