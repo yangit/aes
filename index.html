@@ -32,7 +32,7 @@
 </head>
 
 <body>
-  <label for="password">Enter password:</label><br>
+  <label for="password" id="passwordlabel">Enter password:</label><br>
   <input type="password" id="password"><br><br>
   <label for="textarea_encoded">Enter json to decode:</label><br>
   <input type="textarea" id="textarea_encoded" /><br><br>
@@ -198,10 +198,12 @@
 
 
         document.getElementById('textarea_decoded').value = decryptedText
-        document.getElementById('password').readOnly = true;
+        document.getElementById('password').hidden = true;
+        document.getElementById('passwordlabel').hidden = true;
         document.getElementById('textarea_decoded').style.height = 'auto';
         document.getElementById('textarea_decoded').style.height = document.getElementById('textarea_decoded').scrollHeight + 'px';
         originalContentsSha256 = await sha256FromString(decryptedText);
+        onDecodedInput();
 
       } catch (error) {
         console.log(error);
