@@ -176,7 +176,9 @@
       try {
         let encodedJson;
         if (document.getElementById('textarea_encoded').value.startsWith('http')) {
-          const response = await fetch(document.getElementById('textarea_encoded').value);
+          const response = await fetch(document.getElementById('textarea_encoded').value, {
+            cache: 'no-store'
+          });
           encodedJson = await response.json();
         } else {
           encodedJson = JSON.parse(document.getElementById('textarea_encoded').value);
