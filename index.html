@@ -65,7 +65,6 @@
       return hashHex;
     }
     const onDecodedInput = async ()=>{
-      console.log(originalContentsSha256,await sha256FromString(document.getElementById('textarea_decoded').value))
       if (originalContentsSha256 !== await sha256FromString(document.getElementById('textarea_decoded').value)){
         document.getElementById('textarea_decoded').style.backgroundColor = 'orange';
       } else {
