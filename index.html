@@ -40,7 +40,7 @@
   <button onclick="decodeForm()">Decode</button><br><br>
 
   <label for="textarea_decoded">Enter text to encode:</label><br>
-  <textarea id="textarea_decoded" rows="20" cols="50"></textarea><br><br>
+  <textarea id="textarea_decoded" onInput="onDecodedInput()" rows="20" cols="50"></textarea><br><br>
 
 
 
@@ -51,6 +51,27 @@
 
   <script>
 
+    let originalContentsSha256 = '';
+    const sha256FromString = async (str)=>{
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+
+      // Calculate the SHA-256 hash
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+      // Convert the hash to a hexadecimal string
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+    const onDecodedInput = async ()=>{
+      console.log(originalContentsSha256,await sha256FromString(document.getElementById('textarea_decoded').value))
+      if (originalContentsSha256 !== await sha256FromString(document.getElementById('textarea_decoded').value)){
+        document.getElementById('textarea_decoded').style.backgroundColor = 'orange';
+      } else {
+         document.getElementById('textarea_decoded').style.backgroundColor = 'white';
+      }
+    }
     const textEncoder = new TextEncoder();
     const textDecoder = new TextDecoder();
     function hexStringToUint8Array(hexString) {
@@ -179,6 +200,7 @@
         document.getElementById('password').readOnly = true;
         document.getElementById('textarea_decoded').style.height = 'auto';
         document.getElementById('textarea_decoded').style.height = document.getElementById('textarea_decoded').scrollHeight + 'px';
+        originalContentsSha256 = await sha256FromString(decryptedText);
 
       } catch (error) {
         console.log(error);
