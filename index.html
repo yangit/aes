@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
-  <title>Encode Text v4</title>
+  <title>Encode Text v5</title>
   <style>
     input {
       width: 100%;
@@ -40,7 +40,7 @@
   <button onclick="decodeForm()">Decode</button><br><br>
 
   <label for="textarea_decoded">Enter text to encode:</label><br>
-  <textarea id="textarea_decoded" rows="5" cols="50"></textarea><br><br>
+  <textarea id="textarea_decoded" rows="20" cols="50"></textarea><br><br>
 
 
 
@@ -50,7 +50,7 @@
   <input type="text" id="textarea_encoded2" readonly></textarea>
 
   <script>
-    
+
     const textEncoder = new TextEncoder();
     const textDecoder = new TextDecoder();
     function hexStringToUint8Array(hexString) {
@@ -153,7 +153,15 @@
     async function decodeForm() {
 
       try {
-        const encodedJson = JSON.parse(document.getElementById('textarea_encoded').value);
+        let encodedJson;
+        if (document.getElementById('textarea_encoded').value.startsWith('http')) {
+          const response = await fetch(document.getElementById('textarea_encoded').value);
+          encodedJson = await response.json();
+
+
+        } else {
+          encodedJson = JSON.parse(document.getElementById('textarea_encoded').value);
+        }
         const passwordString = document.getElementById('password').value;
         if (!encodedJson.ivString || !encodedJson.cipherText || !passwordString) {
           throw new Error("Please enter both text and password.");
