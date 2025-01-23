@@ -9,7 +9,7 @@
 
 <body>
   <label for="password">Enter password:</label><br>
-  <input type="text" id="password"><br><br>
+  <input type="password" id="password"><br><br>
   <label for="textarea_encoded">Enter json to decode:</label><br>
   <input type="textarea" id="textarea_encoded" /><br><br>
 
@@ -23,7 +23,7 @@
   <button onclick="encodeForm()">Encode</button><br><br>
 
   <label for="textarea_encoded2">Encoded result:</label><br>
-  <textarea id="textarea_encoded2" rows="5" cols="50" readonly></textarea>
+  <input type="text" id="textarea_encoded2" readonly></textarea>
 
   <script>
     const textEncoder = new TextEncoder();
@@ -126,26 +126,26 @@
     };
 
     async function decodeForm() {
-      console.log(1);
+
       try {
         const encodedJson = JSON.parse(document.getElementById('textarea_encoded').value);
         const passwordString = document.getElementById('password').value;
         if (!encodedJson.ivString || !encodedJson.cipherText || !passwordString) {
           throw new Error("Please enter both text and password.");
         }
-        console.log(2);
+
         
         const cryptoKey = await mypbkdfToKey(passwordString)
-        console.log(3, cryptoKey, encodedJson,passwordString);
+
         const decryptedText = await decrypt({
           cipherText: encodedJson.cipherText,
           ivString: encodedJson.ivString,
           key: cryptoKey
         });
-        console.log(decryptedText);
+
         
         document.getElementById('textarea_decoded').value = decryptedText
-        console.log(4);
+        document.getElementById('password').readOnly = true;
 
       } catch (error) {
         document.getElementById('textarea_decoded').value = error.message;
