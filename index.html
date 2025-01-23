@@ -172,7 +172,7 @@
         document.getElementById('textarea_decoded').value = decryptedText
         document.getElementById('password').readOnly = true;
         document.getElementById('textarea_decoded').style.height = 'auto';
-        document.getElementById('textarea_decoded').style.height = this.scrollHeight + 'px';
+        document.getElementById('textarea_decoded').style.height = document.getElementById('textarea_decoded').scrollHeight + 'px';
 
       } catch (error) {
         console.log(error);
