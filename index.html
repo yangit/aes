@@ -50,6 +50,7 @@
   <input type="text" id="textarea_encoded2" readonly></textarea>
 
   <script>
+    
     const textEncoder = new TextEncoder();
     const textDecoder = new TextDecoder();
     function hexStringToUint8Array(hexString) {
@@ -170,6 +171,8 @@
 
         document.getElementById('textarea_decoded').value = decryptedText
         document.getElementById('password').readOnly = true;
+        document.getElementById('textarea_decoded').style.height = 'auto';
+        document.getElementById('textarea_decoded').style.height = this.scrollHeight + 'px';
 
       } catch (error) {
         console.log(error);
