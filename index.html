@@ -194,16 +194,6 @@
         }));
         document.getElementById('textarea_encoded2').select();
         document.getElementById('textarea_encoded2').setSelectionRange(0, 999999999999);
-
-        try {
-          const successful = document.execCommand('copy');
-          const msg = successful ? 'successful' : 'unsuccessful';
-          alert('Copying text was ' + msg);
-          alert('Text copied to clipboard!');
-        } catch (err) {
-          console.error('Unable to copy', err);
-          alert('Failed to copy text. Please try again.');
-        }
       } catch (error) {
         console.log(error);
 
