@@ -195,7 +195,7 @@
         document.getElementById('textarea_encoded2').select();
         document.getElementById('textarea_encoded2').setSelectionRange(0, 999999999999);
 
-                try {
+        try {
           const successful = document.execCommand('copy');
           const msg = successful ? 'successful' : 'unsuccessful';
           alert('Copying text was ' + msg);
