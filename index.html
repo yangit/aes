@@ -134,7 +134,7 @@
           throw new Error("Please enter both text and password.");
         }
 
-        
+
         const cryptoKey = await mypbkdfToKey(passwordString)
 
         const decryptedText = await decrypt({
@@ -143,11 +143,12 @@
           key: cryptoKey
         });
 
-        
+
         document.getElementById('textarea_decoded').value = decryptedText
         document.getElementById('password').readOnly = true;
 
       } catch (error) {
+        console.log(error);
         document.getElementById('textarea_decoded').value = error.message;
         return;
       }
@@ -155,21 +156,28 @@
     }
 
     async function encodeForm() {
-      const text = document.getElementById('textarea_decoded').value;
-      const passwordString = document.getElementById('password').value;
-      const cryptoKey = await mypbkdfToKey(passwordString)
+      try {
+     
+        const text = document.getElementById('textarea_decoded').value;
+        const passwordString = document.getElementById('password').value;
+        const cryptoKey = await mypbkdfToKey(passwordString)
+        if (!text || !passwordString) {
+          throw new Error("Please enter both text and password.");
+        }
+        document.getElementById('textarea_encoded2').value = JSON.stringify(await encrypt({
+          message: text,
+          key: cryptoKey
+        }));
+        document.getElementById('textarea_encoded2').select();
+        document.getElementById('textarea_encoded2').setSelectionRange(0, 999999999999); 
+      } catch (error) {
+        console.log(error);
+        
+        document.getElementById('textarea_encoded2').value = error.message;
 
-      if (!text || !passwordString) {
-        // alert('Please enter both text and password.');
-        document.getElementById('textarea_encoded2').value = '';
         return;
       }
 
-
-      document.getElementById('textarea_encoded2').value = JSON.stringify(await encrypt({
-        message: text,
-        key: cryptoKey
-      }));
     }
 
   </script>
