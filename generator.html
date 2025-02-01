@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+  <title>Keygen</title>
+  <style>
+    input {
+      width: 100%;
+    }
+
+    textarea {
+      width: 100%;
+    }
+
+    form {
+      width: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    button {
+      width: 100%;
+      height: 50px;
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+  <label for="password" id="passwordlabel">Enter password:</label><br>
+  <input type="password" id="password"  oninput="onUpdate()"><br /><br />
+  <label for="message">Message:</label><br>
+  <input type="textarea" id="message"  oninput="onUpdate()" /><br /><br />
+
+  <label for="textarea_decoded">Result:</label><br>
+  <textarea id="textarea_decoded" readonly rows="3" cols="50"></textarea><br /><br />
+  <script>
+
+    function hexStringToUint8Array(hexString) {
+      if (hexString.length % 2 != 0) {
+        throw new Error('hexString has an odd length');
+        return;
+      }
+
+      const uint8Array = new Uint8Array(hexString.length / 2);
+
+      for (let i = 0; i < hexString.length; i += 2) {
+        uint8Array[i / 2] = parseInt(hexString.slice(i, i + 2), 16);
+      }
+
+      return uint8Array;
+    }
+
+
+    function uint8ArrayToHex(uint8Array) {
+      return Array.from(uint8Array)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+    function arrayBufferToHex(buffer) {
+      return [...new Uint8Array(buffer)]
+        .map(x => x.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+
+
+
+
+    const createFwKey = async (passwordString, messageHex) => { // (message: Uint8Array)
+      // chosen by fair dice roll, guaranteed to be random!
+      const saltHex = '2d4c137ad2425ce1915844480e910c3600227c888775b8c7dad05fb97c683519';
+      return createAnyKey(passwordString, messageHex, saltHex);
+    };
+
+    const createPjngKey = async (passwordString, messageHex) => {
+      // chosen by fair dice roll, guaranteed to be random!
+      const saltHex = '4480b8c7dad0527c88877525ce191584fb97c6835193a5c137ad2410c36002e9';
+
+      return createAnyKey(passwordString, messageHex, saltHex);
+    };
+
+    const createAnyKey = async (passwordString, messageHex, saltHex) => {
+      const encoder = new TextEncoder();
+
+      const importedKey = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(passwordString),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveBits']
+      );
+
+      const pbkdfDerrivedBits = await crypto.subtle.deriveBits(
+        {
+          name: 'PBKDF2',
+          salt: hexStringToUint8Array(saltHex),
+          iterations: 1000000,
+          hash: 'SHA-256'
+        },
+        importedKey,
+        256
+      );
+
+      const pbkdfDerrivedKey = await crypto.subtle.importKey(
+        'raw',
+        pbkdfDerrivedBits,
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+
+      // Create the HMAC
+      const signature = await crypto.subtle.sign(
+        'HMAC',
+        pbkdfDerrivedKey,
+        hexStringToUint8Array(messageHex)
+      );
+
+      return arrayBufferToHex(signature);
+    };
+
+    async function sha256FromHex(hexString) {
+
+      // Use Web Crypto API to calculate SHA-256
+      const hashBuffer = await crypto.subtle.digest('SHA-256', hexStringToUint8Array(hexString));
+
+      // Convert ArrayBuffer to hex string
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      return hashHex;
+    }
+
+
+  async function sha256(message) {
+    // encode as UTF-8
+    const msgBuffer = new TextEncoder().encode(message);
+
+    // hash the message
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+
+    // convert ArrayBuffer to Array
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+    // convert bytes to hex string
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
+
+
+    const onUpdate = async () => {
+      try {
+        const messageWithDashes = document.getElementById('message').value;
+        const passwordString = document.getElementById('password').value;
+        const shaFromPasswordString = await sha256(passwordString);
+        
+        if ( shaFromPasswordString.startsWith('73da4085')) {
+          document.getElementById('password').style.backgroundColor = 'green';
+        } else {
+           document.getElementById('password').style.backgroundColor = '';
+        }
+
+        const messageHex = messageWithDashes.replace(/-/g, '');
+        if (passwordString.length === 0 || messageHex.length===0){
+          throw new Error('')
+        }
+        if (messageHex.length!=24) {
+          throw new Error(`Message length is ${messageHex.length} should be 24`)
+        }
+
+        const keyFwHex = await createFwKey(passwordString, messageHex);
+        const keyPjngHex = await createPjngKey(passwordString, messageHex);
+        const keyPjngSha = (await sha256FromHex(keyPjngHex)).slice(0, 8)
+        document.getElementById('textarea_decoded').value = `${keyFwHex}\n${keyPjngHex}\n${keyPjngSha}`;
+        
+      } catch (error) {
+        document.getElementById('textarea_decoded').value = `${error.message}`;
+      }
+
+    }
+  </script>
+
+</body>
+
+</html>
