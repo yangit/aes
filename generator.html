@@ -177,7 +177,7 @@
         const keyFwHex = await createFwKey(passwordString, messageHex);
         const keyPjngHex = await createPjngKey(passwordString, messageHex);
         const keyPjngSha = (await sha256FromHex(keyPjngHex)).slice(0, 8)
-        document.getElementById('textarea_decoded').value = `${keyFwHex}\n${keyPjngHex}\n${keyPjngSha}`;
+        document.getElementById('textarea_decoded').value = `${keyFwHex}\n${keyPjngHex}\n${keyPjngSha}`.toUpperCase();
         
       } catch (error) {
         document.getElementById('textarea_decoded').value = `${error.message}`;
