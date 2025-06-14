@@ -38,7 +38,7 @@
   <input type="textarea" id="message"  oninput="onUpdate()" /><br /><br />
 
   <label for="textarea_decoded">Result:</label><br>
-  <textarea id="textarea_decoded" readonly rows="3" cols="50"></textarea><br /><br />
+  <textarea id="textarea_decoded" readonly rows="4" cols="50"></textarea><br /><br />
   <script>
 
     function hexStringToUint8Array(hexString) {
@@ -175,9 +175,10 @@
         }
 
         const keyFwHex = await createFwKey(passwordString, messageHex);
+        const keyFwSha = (await sha256FromHex(keyFwHex)).slice(0, 8)
         const keyPjngHex = await createPjngKey(passwordString, messageHex);
         const keyPjngSha = (await sha256FromHex(keyPjngHex)).slice(0, 8)
-        document.getElementById('textarea_decoded').value = `${keyFwHex}\n${keyPjngHex}\n${keyPjngSha}`.toUpperCase();
+        document.getElementById('textarea_decoded').value = `${keyFwHex}\n${keyFwSha}\n${keyPjngHex}\n${keyPjngSha}`.toUpperCase();
         
       } catch (error) {
         document.getElementById('textarea_decoded').value = `${error.message}`;
